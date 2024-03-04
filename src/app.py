@@ -3,20 +3,22 @@ from datetime import timedelta
 from flask import Flask, Response, g, redirect, request, jsonify, send_file, url_for
 import os
 from flask_jwt_extended import jwt_required, get_jwt_identity, JWTManager, create_access_token, verify_jwt_in_request
-
-from src.config.dbconnect import initialize_db
-from src.models.user_models import User_Model
+from flask_cors import CORS
+from .config.dbconnect import initialize_db
+from .models.user_models import User_Model
 from dotenv import load_dotenv
     
 load_dotenv()
 
 app = Flask(__name__)
-
+#REMOVE SOON
+CORS(app)
 
 
 jwt_secret = os.getenv("JWTSECRET")
 
-mongo_uri = os.getenv("MONGODB_URI")
+mongo_uri = os.getenv("MONGO_URI")
+print(mongo_uri)
 
 app.config["MONGO_URI"] = mongo_uri
 

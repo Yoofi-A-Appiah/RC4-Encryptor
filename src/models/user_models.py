@@ -22,18 +22,16 @@ class User_Model:
         users_collection.insert_one({'username': username, 'password': hashed_password})
         return jsonify({'message': 'User registered successfully'}), 201
     
-    def login(self, username,password):
+    def login(self, username, password):
         users_collection = mongo.db.users
-
-
         user = users_collection.find_one({'username': username})
+        
         if user and check_password_hash(user['password'], password):
             # Create JWT token or session token
             access_token = create_access_token(identity=username)
-            response = Response()
+            response = jsonify({'access_token': access_token})
+            response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:5173'
             response.status_code = 200
-            # Set token in response cookies
-            response.set_cookie('access_token_cookie', value=access_token)
             return response
         else:
             return jsonify({'message': 'Invalid credentials'}), 401
