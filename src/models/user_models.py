@@ -30,7 +30,6 @@ class User_Model:
             # Create JWT token or session token
             access_token = create_access_token(identity=username)
             response = jsonify({'access_token': access_token})
-            response.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:5173'
             response.status_code = 200
             return response
         else:

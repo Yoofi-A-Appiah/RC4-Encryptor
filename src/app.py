@@ -1,6 +1,6 @@
 import base64
 from datetime import timedelta
-from flask import Flask, Response, g, redirect, request, jsonify, send_file, url_for
+from flask import Flask, Response, g, redirect, request, jsonify, send_file, url_for, make_response
 import os
 from flask_jwt_extended import jwt_required, get_jwt_identity, JWTManager, create_access_token, verify_jwt_in_request
 from flask_cors import CORS
@@ -12,7 +12,7 @@ load_dotenv()
 
 app = Flask(__name__)
 #REMOVE SOON
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from any origin
 
 
 jwt_secret = os.getenv("JWTSECRET")
@@ -100,7 +100,8 @@ def encrypt_file(filename, content, key):
         k = S[(S[i] + S[j]) % 256]
         ciphertext.append(char ^ k)
     encrypted_filename = filename + '.enc'
-    with open(encrypted_filename, 'wb' ) as f:
+    encrypted_filepath = os.path.join('src', encrypted_filename)
+    with open(encrypted_filepath, 'wb' ) as f:
         f.write(ciphertext)
     return ciphertext, encrypted_filename
 
@@ -117,13 +118,12 @@ def decrypt_file(filename, content, key):
         k = S[(S[i] + S[j]) % 256]
         plaintext.append(char ^ k)
     decrypted_filename = filename.replace('.enc', '')
-    with open(decrypted_filename, 'wb' ) as f:
+    decrypted_filepath = os.path.join('src', decrypted_filename)
+    with open(decrypted_filepath, 'wb' ) as f:
         f.write(plaintext)
     return plaintext, decrypted_filename
 
-from flask import send_file, make_response, jsonify
 
-from flask import send_file, make_response
 
 @app.route('/encrypt-file', methods=['POST'])
 def encrypt_file_route():
@@ -155,4 +155,4 @@ def decrypt_file_route():
 
 if __name__ == '__main__':
 
-    app.run(debug=True)
+    app.run(host="0.0.0.0",debug=True)
